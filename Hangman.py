@@ -11,6 +11,11 @@ import PIL
 from PIL import Image
 
 
+
+#Test if this updates
+
+
+
 #Got this working in Test.py
 image = Image.open(r'C:\Users\carte\OneDrive\Desktop\Coding\Hangman\HM_1.png')
 image.thumbnail((200, 200))
