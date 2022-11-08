@@ -12,12 +12,9 @@ from PIL import Image
 
 
 
-#Test if this updates
 
-
-
-#Got this working in Test.py
-image = Image.open(r'C:\Users\carte\OneDrive\Desktop\Coding\Hangman\HM_1.png')
+n ='2'
+image = Image.open(r'C:\Users\carte\OneDrive\Desktop\Coding\Hangman\HM_' + n + '.png')
 image.thumbnail((200, 200))
 bio = io.BytesIO()
 image.save(bio, format="PNG")
@@ -30,14 +27,15 @@ layout =[   [sg.Image( key="-IMAGE-")],
             [sg.Input(key='-IN-')],
             [sg.Button("ENTER"), sg.Exit("EXIT GAME")]]
 
-gamelayout =[ [sg.Image(data=bio.getvalue(), key="-IMAGE-")],
-              [sg.Text("Welcome to the Game"), sg.Text(size=(15,1), key='-OUTPUT-')],
-              [sg.Input(key='-IN-')],
-              [sg.Button(), sg.Exit("EXIT GAME")]]
-               
-
 window = sg.Window("Hangman Game", layout, margins = (400, 200),finalize=True, resizable = True)
 window['-OUTPUT-'].update('Hello, please enter a word or phrase for the Hangman Game')
+
+
+
+class node:
+    def __init__(self, val=None, show = False):
+        self.dataval = dataval
+        self.nextval = None
 
 
 #Opens the window and asks for a sentence to play hangman
@@ -66,7 +64,7 @@ def StartGame():
                 if ( last_char == ' '):
                     print ( "Invalid Entry - Ends with a Space" )
                 else:
-                    print('Valid')
+                    print('Valid Entry')
                     PlayGame(values['-IN-'])
                     valid = True
                 
@@ -81,6 +79,7 @@ def PlayGame(inputString):
     Refresh( "Game" )
     #Maybe create another function for the actual game.
     #Probalby pass - InputString,
+    
     
     
 
@@ -98,11 +97,17 @@ def Refresh( ScreenType ):
         
         #HOLY FUCK I DID IT
         window['-IMAGE-'].update(data=bio.getvalue())
-        window['-OUTPUT-'].update(("Now you play the game"))
+        window['-OUTPUT-'].update(("Please Enter a letter to guess"))
         event , values = window.read()
         
+        
     else:
-        print("else")
+        print("What are you trying to load")
+
+def Game(array):
+    print("Game function")
+
+#def makeArray(inputString)
 
 
 StartGame()
