@@ -13,7 +13,7 @@ from PIL import Image
 
 
 
-n ='2'
+n ='1'
 image = Image.open(r'C:\Users\carte\OneDrive\Desktop\Coding\Hangman\HM_' + n + '.png')
 image.thumbnail((200, 200))
 bio = io.BytesIO()
@@ -23,7 +23,8 @@ image.save(bio, format="PNG")
 sg.theme ( 'DarkPurple' )
 
 layout =[   [sg.Image( key="-IMAGE-")],
-            [sg.Text(('')), sg.Text(size=(50,1), key='-OUTPUT-')],    
+            [sg.Text(('')), sg.Text(size=(50,1), key='-OUTPUT-')],
+            [sg.Text(('')), sg.Text(size=(50,1), key='-OUTPUT2-')],
             [sg.Input(key='-IN-')],
             [sg.Button("ENTER"), sg.Exit("EXIT GAME")]]
 
@@ -31,15 +32,8 @@ window = sg.Window("Hangman Game", layout, margins = (400, 200),finalize=True, r
 window['-OUTPUT-'].update('Hello, please enter a word or phrase for the Hangman Game')
 
 
-
-class node:
-    def __init__(self, val=None, show = False):
-        self.dataval = dataval
-        self.nextval = None
-
-
-#Opens the window and asks for a sentence to play hangman
-def StartGame():
+#Opens the window and asks for an input to play hangman
+def getInput():
     valid = False
     values = ""
     length = 0
@@ -56,15 +50,22 @@ def StartGame():
             inputString = values['-IN-']
             
             if (length == 0 or (has_numbers(values['-IN-']) == True)):
+                #
+                #Delete this at the end
                 print('Invalid Entry')
+                window['-OUTPUT2-'].update('Invalid Entry - No Input')
             #Need this to not get errror is the length is zero
             else:
                 #Have to do this after making sure the length isnt' zero
                 last_char = inputString[-1]
                 if ( last_char == ' '):
+                    #
+                    #Delete this at the end
                     print ( "Invalid Entry - Ends with a Space" )
+                    window['-OUTPUT2-'].update('Invalid Entry - Ends with a Space')
                 else:
                     print('Valid Entry')
+                    window['-OUTPUT2-'].update('')
                     PlayGame(values['-IN-'])
                     valid = True
                 
@@ -73,12 +74,32 @@ def StartGame():
             break
 
 def PlayGame(inputString):
-    print ( inputString )
-    
+    correctGuesses = 0
     #Refreshing the screen to the game screen
-    Refresh( "Game" )
+    Refresh( "Game", n )
+    
+    arr = list(inputString)
+
+    root = arrayToList(arr, len(arr))
+    String = update(root)
+    window['-OUTPUT2-'].update(String)
+
+    #Guessing Loop
+    #There isn't a do while. Might have to do while(True) and break statement with the Gamewon() function
+    while(correctGuesses != len(arr)):
+        event , values = window.read()
+        inVal = values['-IN-']
+        if( len(inVal) == 1 and (has_numbers(inVal == True) )):
+            print("Valid Input")
+        else:
+            break
+            
+    
+    
+    
     #Maybe create another function for the actual game.
     #Probalby pass - InputString,
+    
     
     
     
@@ -91,25 +112,103 @@ def has_numbers(inputString):
 #Now it will update the text.
 #Needs to update the text box to get rid of it
 #Needs to input my picture
-def Refresh( ScreenType ):
+def Refresh( ScreenType, a ):
 
     if ( ScreenType == "Game" ):
-        
+
         #HOLY FUCK I DID IT
         window['-IMAGE-'].update(data=bio.getvalue())
         window['-OUTPUT-'].update(("Please Enter a letter to guess"))
-        event , values = window.read()
+        #event , values = window.read()
         
         
     else:
-        print("What are you trying to load")
-
-def Game(array):
-    print("Game function")
-
-#def makeArray(inputString)
+        print("What are you trying to load?")
 
 
-StartGame()
+
+
+
+#---------------------------------------------------------------------
+#--------Input, Node, Checkguess, New Image Functions-----------------
+#---------------------------------------------------------------------
+#---------------------------------------------------------------------
+
+
+
+# Representation of a node
+class Node: 
+    def __init__(self, val, show = False): 
+        self.val = val
+        self.next = None
+        self.show = False
+  
+# Function to insert node
+def insert(root, item):
+    temp = Node(item)
+
+    if(item == ' '):
+        temp.show = True
+    else:
+        temp.show = False
+      
+    if (root == None):
+        root = temp
+    else :
+        ptr = root
+        while (ptr.next != None):
+            ptr = ptr.next
+        ptr.next = temp
+      
+    return root
+  
+def update(root):
+    Str = ""
+    
+    while (root != None):
+        if( root.show == True ):
+            Str = Str + "      " + root.val
+        else:
+            Str = Str + " _ "
+        root = root.next
+
+    return Str
+          
+def arrayToList(arr, n):
+    root = None
+    for i in range(0, n, 1):
+        root = insert(root, arr[i])
+      
+    return root
+
+def CheckGuess( char, head ):
+    curr = head
+    n = 0
+    while( curr != None ):
+        if( curr.val == char ):
+            if( curr.show == False ):
+                n = n + 1
+            curr.show = True
+            curr = curr.next
+        else:
+            curr = curr.next
+    print( "You found ", n ," instances of -" , char , "-" )
+
+    if( n == 0 ):
+        newImage()
+    return head, n
+
+def newImage():
+    print("Change to next image")
+
+
+
+
+
+
+
+
+
+getInput()
 print( "Window Closed")
 window.close()
