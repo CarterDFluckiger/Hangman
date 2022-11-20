@@ -28,7 +28,7 @@ layout =[   [sg.Image( key="-IMAGE-")],
             [sg.Input(key='-IN-')],
             [sg.Button("ENTER"), sg.Exit("EXIT GAME")]]
 
-window = sg.Window("Hangman Game", layout, margins = (400, 200),finalize=True, resizable = True)
+window = sg.Window("Hangman Game", layout, margins = (150, 150),finalize=True, resizable = True)
 window['-OUTPUT-'].update('Hello, please enter a word or phrase for the Hangman Game')
 
 
@@ -74,6 +74,7 @@ def getInput():
             break
 
 def PlayGame(inputString):
+    x = 0
     correctGuesses = 0
     #Refreshing the screen to the game screen
     Refresh( "Game", n )
@@ -87,12 +88,23 @@ def PlayGame(inputString):
     #Guessing Loop
     #There isn't a do while. Might have to do while(True) and break statement with the Gamewon() function
     while(correctGuesses != len(arr)):
+        x = 0
         event , values = window.read()
         inVal = values['-IN-']
-        if( len(inVal) == 1 and (has_numbers(inVal == True) )):
-            print("Valid Input")
-        else:
+
+        if(event == sg.WIN_CLOSED or event =='EXIT GAME'):
             break
+        
+        elif( len(inVal) == 1 and (inVal.isdigit() == False )):
+            print("Valid Input")
+            root, x  = CheckGuess( inVal, root )
+            window['-OUTPUT2-'].update(update(root))
+            correctGuesses = correctGuesses + x
+            print(correctGuesses)
+            print(len(inputString))
+            
+        else:
+            print( "Invalid" )
             
     
     
@@ -119,8 +131,6 @@ def Refresh( ScreenType, a ):
         #HOLY FUCK I DID IT
         window['-IMAGE-'].update(data=bio.getvalue())
         window['-OUTPUT-'].update(("Please Enter a letter to guess"))
-        #event , values = window.read()
-        
         
     else:
         print("What are you trying to load?")
@@ -167,7 +177,10 @@ def update(root):
     
     while (root != None):
         if( root.show == True ):
-            Str = Str + "      " + root.val
+            if(root.val == " "):
+                Str = Str + "       " + root.val
+            else:
+                Str = Str + " " + root.val
         else:
             Str = Str + " _ "
         root = root.next
@@ -181,11 +194,19 @@ def arrayToList(arr, n):
       
     return root
 
+#Finds the number of spaces in the array of characters
+def numSpaces(arr):
+    p = 0
+    for x in arr:
+        if(arr[x] == ' '):
+            p += 1
+    return p
+
 def CheckGuess( char, head ):
     curr = head
     n = 0
     while( curr != None ):
-        if( curr.val == char ):
+        if( curr.val == char or curr.val == char.upper() or curr.val == char.lower() ):
             if( curr.show == False ):
                 n = n + 1
             curr.show = True
