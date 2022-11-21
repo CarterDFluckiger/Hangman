@@ -13,8 +13,8 @@ from PIL import Image
 
 
 
-n ='1'
-image = Image.open(r'C:\Users\carte\OneDrive\Desktop\Coding\Hangman\HM_' + n + '.png')
+n = 49 
+image = Image.open(r'C:\Users\carte\OneDrive\Desktop\Coding\Hangman\HM_' + chr(n) + '.png')
 image.thumbnail((200, 200))
 bio = io.BytesIO()
 image.save(bio, format="PNG")
@@ -25,7 +25,8 @@ sg.theme ( 'DarkPurple' )
 layout =[   [sg.Image( key="-IMAGE-")],
             [sg.Text(('')), sg.Text(size=(50,1), key='-OUTPUT-')],
             [sg.Text(('')), sg.Text(size=(50,1), key='-OUTPUT2-')],
-            [sg.Input(key='-IN-')],
+            [sg.Text(('')), sg.Text(size=(50,1), key='-OUTPUT3-')],
+            [sg.Input(key='-IN-', do_not_clear=False)],
             [sg.Button("ENTER"), sg.Exit("EXIT GAME")]]
 
 window = sg.Window("Hangman Game", layout, margins = (150, 150),finalize=True, resizable = True)
@@ -77,9 +78,12 @@ def PlayGame(inputString):
     x = 0
     correctGuesses = 0
     #Refreshing the screen to the game screen
-    Refresh( "Game", n )
+    Refresh( n )
     
     arr = list(inputString)
+    arrGuessed = []
+
+    correctGuesses = numSpaces(arr)
 
     root = arrayToList(arr, len(arr))
     String = update(root)
@@ -92,29 +96,50 @@ def PlayGame(inputString):
         event , values = window.read()
         inVal = values['-IN-']
 
+        guessed = alreadyGuessed(arrGuessed, inVal )
+
         if(event == sg.WIN_CLOSED or event =='EXIT GAME'):
             break
         
-        elif( len(inVal) == 1 and (inVal.isdigit() == False )):
+        elif( len(inVal) == 1 and (inVal.isdigit() == False and guessed == False)):
+            arrGuessed.append(inVal)
+            print(alreadyGuessed)
             print("Valid Input")
             root, x  = CheckGuess( inVal, root )
+            
+            if(x == 0):
+                print("Incorrect Guess")
+                newImage(n)
+            
             window['-OUTPUT2-'].update(update(root))
             correctGuesses = correctGuesses + x
-            print(correctGuesses)
-            print(len(inputString))
             
         else:
             print( "Invalid" )
-            
+    if(correctGuesses == len(arr)):
+        #window['-Image-'].update("")
+        window['-OUTPUT-'].update("You won the Game!")
+        window['-OUTPUT2-'].update("The answer was: "+ inputString)
+        window['-OUTPUT3-'].update("")
+        event , values = window.read()
     
+
+
+def newImage(i):
+    n +=1
+    image = Image.open(r'C:\Users\carte\OneDrive\Desktop\Coding\Hangman\HM_' + chr(n) + '.png')
+    image.thumbnail((200, 200))
+    bio = io.BytesIO()
+    image.save(bio, format="PNG")
     
+    window['-IMAGE-'].update(data=bio.getvalue())
+
     
-    #Maybe create another function for the actual game.
-    #Probalby pass - InputString,
-    
-    
-    
-    
+def alreadyGuessed(arr, char):
+    for x in arr:
+        if(x == char):
+            return True
+    return False
 
 
 #Checks if the input has numbers in ( we don't want numbers in their)
@@ -124,27 +149,17 @@ def has_numbers(inputString):
 #Now it will update the text.
 #Needs to update the text box to get rid of it
 #Needs to input my picture
-def Refresh( ScreenType, a ):
-
-    if ( ScreenType == "Game" ):
+def Refresh( a ):
 
         #HOLY FUCK I DID IT
         window['-IMAGE-'].update(data=bio.getvalue())
         window['-OUTPUT-'].update(("Please Enter a letter to guess"))
-        
-    else:
-        print("What are you trying to load?")
-
-
-
 
 
 #---------------------------------------------------------------------
 #--------Input, Node, Checkguess, New Image Functions-----------------
 #---------------------------------------------------------------------
 #---------------------------------------------------------------------
-
-
 
 # Representation of a node
 class Node: 
@@ -215,18 +230,14 @@ def CheckGuess( char, head ):
             curr = curr.next
     print( "You found ", n ," instances of -" , char , "-" )
 
-    if( n == 0 ):
-        newImage()
     return head, n
 
-def newImage():
-    print("Change to next image")
-
-
-
-
-
-
+def numSpaces(array):
+    p = 0
+    for x in array:
+        if(x == ' '):
+            p += 1
+    return p
 
 
 
