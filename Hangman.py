@@ -13,7 +13,8 @@ from PIL import Image
 
 
 
-n = 49 
+n = 49
+
 image = Image.open(r'C:\Users\carte\OneDrive\Desktop\Coding\Hangman\HM_' + chr(n) + '.png')
 image.thumbnail((200, 200))
 bio = io.BytesIO()
@@ -100,6 +101,11 @@ def PlayGame(inputString):
 
         if(event == sg.WIN_CLOSED or event =='EXIT GAME'):
             break
+
+        elif( n == 55 ):
+            newImage(n)
+            GameLost(inputString)
+            return 0
         
         elif( len(inVal) == 1 and (inVal.isdigit() == False and guessed == False)):
             arrGuessed.append(inVal)
@@ -113,7 +119,6 @@ def PlayGame(inputString):
             
             window['-OUTPUT2-'].update(update(root))
             correctGuesses = correctGuesses + x
-            
         else:
             print( "Invalid" )
     if(correctGuesses == len(arr)):
@@ -122,10 +127,13 @@ def PlayGame(inputString):
         window['-OUTPUT2-'].update("The answer was: "+ inputString)
         window['-OUTPUT3-'].update("")
         event , values = window.read()
+        event , values = window.read()
     
 
 
 def newImage(i):
+    global n
+    print( n )
     n +=1
     image = Image.open(r'C:\Users\carte\OneDrive\Desktop\Coding\Hangman\HM_' + chr(n) + '.png')
     image.thumbnail((200, 200))
@@ -155,6 +163,15 @@ def Refresh( a ):
         window['-IMAGE-'].update(data=bio.getvalue())
         window['-OUTPUT-'].update(("Please Enter a letter to guess"))
 
+def GameLost(inputString):
+        window['-OUTPUT-'].update("You fucking lost the Game!")
+        window['-OUTPUT2-'].update("The answer was: "+ inputString)
+        window['-OUTPUT3-'].update("You suck")
+        event , values = window.read()
+
+def playAgain():
+    global n
+    n = 49
 
 #---------------------------------------------------------------------
 #--------Input, Node, Checkguess, New Image Functions-----------------
@@ -238,7 +255,6 @@ def numSpaces(array):
         if(x == ' '):
             p += 1
     return p
-
 
 
 getInput()
